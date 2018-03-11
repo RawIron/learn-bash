@@ -1,0 +1,2 @@
+# scratch-bash
+bash idioms
