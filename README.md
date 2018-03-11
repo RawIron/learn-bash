@@ -1,4 +1,4 @@
-## bash Code-Guide
+# bash Code-Guide
 
 Not everyone is a Bash coding wizard.
 Readable code is more important than consise Bash-idiomatic code.
@@ -24,7 +24,7 @@ A few bash specials:
 * 'sudo rm -rf ${my_path}/' would wipe the whole file system when *$my_path* is empty.
 
 
-### Common Idioms
+## Common Idioms
 
 ```
 # script is run from command line => run main
@@ -35,9 +35,8 @@ A few bash specials:
 [[ "$0" == "$BASH_SOURCE" ]] && main || true
 ```
 
+### inject or mock a function
 ```
-# inject or mock a function
-
 on_prod() {
 	echo "prod"
 }
@@ -57,10 +56,9 @@ fi
 $FUNC
 ```
 
+### ship a function to a remote server via ssh(1)
+* inject all dependencies into the function
 ```
-# ship a function to a remote server via ssh(1)
-# inject all dependencies into the function
-
 ship_this() {
     local dir="$1"
     ls -1 $dir
@@ -70,22 +68,21 @@ cmd="$(typeset -f ship_this); ship_this /tmp"
 ssh -i $ssh_key $ssh_user@$node "$cmd"
 ```
 
+### Strings
+* append to string
 ```
-# append to string
-
 sentence="the"
 sentence="$sentence house"
+```
 
-
-# match string with regex
-
+* match string with regex
+```
 [[ "this is the text" =~ "this * text" ]] && matched
 ```
 
+### optional parameter with default value
+* the 3rd parameter is optional, default value is false
 ```
-# optional parameter with default value
-# the 3rd parameter is optional, default value is false
-
 log_search() {
     local pattern="$1"
     local logfile="$2"
@@ -94,18 +91,16 @@ log_search() {
 }
 ```
 
+### tuples as a delimited string
 ```
-# tuples as a delimited string
-
 my_tuple="first:second"
 
 first=${tuple%:*}
 second=${tuple#*:}
 ```
 
+### counters
 ```
-# counters
-
 # define
 counter=0
 
