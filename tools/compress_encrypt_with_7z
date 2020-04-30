@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+archive_paths="$(readlink -f $1)"
+
+for os_path in "$archive_paths"; do
+  7z a -p -mhe=on "$(basename $os_path)".7z "$os_path"
+done
