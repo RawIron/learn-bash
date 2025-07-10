@@ -1,21 +1,6 @@
 #set -x
+source ./bunit.bash
 
-tests_total=0
-tests_failed=0
-
-should_pass() {
-    [[ $? -eq 0 ]] && echo -n "."  || ( echo -n "F" ; (( ++tests_failed )) )
-    (( ++tests_total ))
-}
-should_fail() {
-    [[ $? -eq 1 ]] && echo -n "."  || ( echo -n "F" ; (( ++tests_failed )) )
-    (( ++tests_total ))
-}
-show_summary() {
-    echo
-    echo "total:  $tests_total"
-    echo "failed: $tests_failed"
-}
 
 # VARIABLES
 
