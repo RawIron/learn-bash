@@ -20,16 +20,19 @@ in_lua() {
 }
 
 
+# encoding, locale, collation
 # raw strings
 # formatted strings
 
-
-# length
+# length in characters
 title="learn bash"
 (( ${#title} == 10 )) ; should_pass
 
 in_python 'len("learn bash") == 10' ; should_pass
 in_lua 'string.len("learn bash") == 10' ; should_pass
+
+# length in bytes
+
 
 # uppercase
 #   [a-zA-Z] = [:alpha:]
@@ -60,7 +63,7 @@ the_cat="a cat lives in a cathouse with other cats."
 # contains
 
 
-# split at delimiter
+# split at a delimiter
 my_tuple="head-tail"
 #   remove tail
 #   match the pattern '-*'    from the right
@@ -73,7 +76,7 @@ first=${my_tuple%-*}
 second=${my_tuple#*-}
 [[ $second == "tail" ]] ; should_pass
 
-# ${variable%-*} finds first from the right
+# ${variable%-*} reluctant matching from the right
 #   -*
 #   -dc.domain.com
 my_host="transformer12-themachine-cell-dc.domain.com"
@@ -83,30 +86,28 @@ my_host="transformer12-themachine-cell-dc.domain.com"
 #   -themachine-cell-dc.domain.com
 [[ ${my_host%%-*} == "transformer12" ]] ; should_pass
 
+# ${variable%%-*} reluctant matching from the left
+#               *-
+#   transformer12-
+[[ ${my_host#*-} == "themachine-cell-dc.domain.com" ]] ; should_pass
 
 # remove a suffix
 full_name='matrix.cpp'
 path='workspace/project/matrix.cpp'
-[[ ${full_name%.cpp} == "matrix" ]] ; should_pass
+[[ ${full_name%.*} == "matrix" ]] ; should_pass
 [[ ${path%/*} == 'workspace/project' ]] ; should_pass
 
 # remove a prefix
-[[ ${full_name#matrix} == ".cpp" ]] ; should_pass
+[[ ${full_name##*.} == "cpp" ]] ; should_pass
 [[ ${path##*/} == $full_name ]] ; should_pass
 
 
-[[ ${my_host#*-} == "themachine-cell-dc.domain.com" ]] ; should_pass
-
-# split at first delimiter
-# with {variable%%-*}
-my_host="transformer12-themachine-cell-dc.domain.com"
-service=${my_host%%-*}
-[[ $service == "transformer12" ]] ; should_pass
-
+# trim
+# remove leading and/or trailing whitespace
 trim_xargs() {
     # simple solution
-    # removes " inside string: 'contains "quoted"'
-    # trim_xargs '   word"word" ' -> wordword
+    # removes " inside string:
+    # trim_xargs '   word"word" ' == wordword
     echo "$1" | xargs
 }
 
@@ -116,7 +117,19 @@ trim() {
     var="${var#"${var%%[![:space:]]*}"}"
     # remove trailing whitespace characters
     var="${var%"${var##*[![:space:]]}"}"
+    echo $var
 }
+
+input='   word"word"  '
+[[ $(trim_xargs "$input") == "wordword" ]] ; should_pass
+[[ $(trim "$input") == 'word"word"' ]] ; should_pass
+#   xargs unmatched double quote error
+input='   word"word  '
+[[ $(trim_xargs "$input") == "wordword" ]] ; should_fail
+
+input='		word  '
+[[ $(trim_xargs "$input") == "word" ]] ; should_pass
+[[ $(trim "$input") == "word" ]] ; should_pass
 
 
 # string interpolation
@@ -132,7 +145,7 @@ first="head"
 second="tail"
 [[ "${first}${second}" == "headtail" ]] ; should_pass
 
-# prepend
+#   prepend
 threads=4
 [[ "${threads},bench" == "4,bench" ]] ; should_pass
 
@@ -142,7 +155,7 @@ with_sed=$( echo "bench" | sed "s/^/${threads},/" )
 in_python 'threads=4; str(threads) + "," + "bench" == "4,bench"' ; should_pass
 in_lua 'threads=4; threads .. "," .. "bench" == "4,bench"' ; should_pass
 
-# append
+#   append
 threads=4
 [[ "bench,${threads}" == "bench,4" ]] ; should_pass
 
