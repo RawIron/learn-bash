@@ -1,25 +1,48 @@
-set -x
+#set -x
 
-greeter_option() {
+source bunit.bash
+
+
+# function with a _pointer_ parameter
+greeter() {
     local mesg="$1"
-    local add_name=${2-false}
+    local name="me"
+    echo $mesg ${!2}
+}
+
+
+# evil access to function local variable
+[[ $(greeter hallo name) == "hallo me" ]] ; should_pass
+
+# pitfall
+# local variable shadows global
+name="them"
+[[ $(greeter hallo name) == "hallo them" ]] ; should_fail
+
+global_name="them"
+[[ $(greeter hallo global_name) == "hallo them" ]] ; should_pass
+[[ $(greeter hallo wrong_name) == "hallo" ]] ; should_pass
+[[ $(greeter hallo) == "hallo" ]] ; should_pass
+
+
+# function with an optional parameter
+#   default value for null and unset is "no"
+greeter_optional() {
+    local mesg="$1"
+    local add_name=${2:-"no"}
     local name="me"
 
-    if [[ add_name ]]; then
+    if [[ $add_name == "yes" ]]; then
         mesg="$mesg $name"
     fi
     echo $mesg
 }
 
-greeter() {
-    local mesg="$1"
-    local name="me"
-    # should print "hallo me"
-    echo ???
-}
-
-message="hallo \$name"
-greeter "$message"
-
-message="hallo"
-greeter_option $message true
+# only yes will print name
+[[ $(greeter_optional "hallo" yes) == "hallo me" ]] ; should_pass
+# otherwise just hallo
+[[ $(greeter_optional "hallo" no) == "hallo" ]] ; should_pass
+[[ $(greeter_optional "hallo" "") == "hallo" ]] ; should_pass
+[[ $(greeter_optional "hallo") == "hallo" ]] ; should_pass
+[[ $(greeter_optional "hallo" false) == "hallo" ]] ; should_pass
+[[ $(greeter_optional "hallo" "anything") == "hallo" ]] ; should_pass
