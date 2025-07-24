@@ -29,14 +29,14 @@ bag=(apples 4 "oranges" 10)
 # sum
 # filter
 
-# convert array to dict
+# convert indexed array to dict
 #   -> error
 declare -A bag=(apples 4 "oranges" 10)
 
-# convert dict to array
+# convert dict to indexed array
+#   -> error
 declare -A box=(apples 4 "oranges" 10)
-# syntax to declare an array??
-box=(apples 4 "oranges" 10)
+declare -a box=(apples 4 "oranges" 10)
 [[ ${box[@]} == "apples 4 oranges 10" ]] ; should_fail
 [[ ${box[@]} == "10 4" ]] ; should_pass
 
