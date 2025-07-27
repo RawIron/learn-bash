@@ -3,13 +3,18 @@
 source bunit.bash
 
 
+# name reference
+#   dereference null or unset does not error
+#   scoped name resolution is used
+
 # function with a _pointer_ parameter
+#   $1 string
+#   $2 name reference
 greeter() {
     local mesg="$1"
     local name="me"
     echo $mesg ${!2}
 }
-
 
 # evil access to function local variable
 [[ $(greeter hallo name) == "hallo me" ]] ; should_pass
@@ -27,6 +32,8 @@ global_name="them"
 
 # function with an optional parameter
 #   default value for null and unset is "no"
+#   $1 string
+#   $2 optional {yes no}
 greeter_optional() {
     local mesg="$1"
     local add_name=${2:-"no"}
