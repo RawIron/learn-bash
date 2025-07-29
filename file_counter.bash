@@ -1,11 +1,12 @@
+source bunit.bash
 
+# function _returns_ a number
+# writes a string to stdout which can be converted to a number
 count_files() {
-    ls -1 | wc -l
+    echo one two three four | wc -w
 }
 
-
-if [[ $(count_files) -le "0" ]]; then
-    echo "no files"
-else
-    echo "many files"
-fi
+[[ $(count_files) -gt "0" ]] ; should_pass
+[[ $(count_files) -gt 0 ]] ; should_pass
+[[ $(count_files) -eq 4 ]] ; should_pass
+(( $(count_files) == 4 )) ; should_pass
